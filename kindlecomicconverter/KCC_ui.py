@@ -200,6 +200,27 @@ class Ui_mainWindow(object):
         self.convertButton.raise_()
         self.formatBox.raise_()
         self.gridLayout.addWidget(self.buttonWidget, 3, 0, 1, 2)
+
+        self.authorBox = QtWidgets.QCheckBox(self.optionWidget)
+        self.authorBox.setObjectName("authorBox")
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.authorBox.sizePolicy().hasHeightForWidth())
+        self.authorBox.setSizePolicy(sizePolicy)
+
+        self.gridLayout_2.addWidget(self.authorBox, 5, 0, 1, 1)
+
+        self.authorEdit = QtWidgets.QLineEdit(self.optionWidget)
+        self.authorEdit.setObjectName("authorEdit")
+        sizePolicy.setHeightForWidth(self.authorEdit.sizePolicy().hasHeightForWidth())
+        self.authorEdit.setSizePolicy(sizePolicy)
+        self.authorEdit.setEnabled(self.authorBox.isChecked())
+
+        self.gridLayout_2.addWidget(self.authorEdit, 5, 1, 1, 2)
+
+        self.gridLayout.addWidget(self.optionWidget, 4, 0, 1, 2)
+
         mainWindow.setCentralWidget(self.centralWidget)
         self.statusBar = QtWidgets.QStatusBar(mainWindow)
         self.statusBar.setSizeGripEnabled(False)
@@ -260,14 +281,17 @@ class Ui_mainWindow(object):
         self.editorButton.setText(_translate("mainWindow", "Editor"))
         self.editorButton.setToolTip(_translate("mainWindow", "<html><head/><body><p  style=\'white-space:pre\'>Shift+Click to edit directory.</p></body></html>"))
         self.wikiButton.setText(_translate("mainWindow", "Wiki"))
-        self.directoryButton.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Add directory containing JPG, PNG or GIF files to queue.<br/><span style=\" font-weight:600;\">CBR, CBZ and CB7 files inside will not be processed!</span></p></body></html>"))
-        self.directoryButton.setText(_translate("mainWindow", "Add directory"))
-        self.fileButton.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Add CBR, CBZ, CB7 or PDF file to queue.</p></body></html>"))
-        self.fileButton.setText(_translate("mainWindow", "Add file"))
+        self.directoryButton.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Add directories containing JPG, PNG or GIF files to queue.<br/><span style=\" font-weight:600;\">CBR, CBZ and CB7 files inside will not be processed!</span></p></body></html>"))
+        self.directoryButton.setText(_translate("mainWindow", "Add directories"))
+        self.fileButton.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Add CBR, CBZ, CB7 or PDF files to queue.</p></body></html>"))
+        self.fileButton.setText(_translate("mainWindow", "Add files"))
         self.deviceBox.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Target device.</p></body></html>"))
         self.formatBox.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Output format.</p></body></html>"))
         self.convertButton.setToolTip(_translate("mainWindow", "<html><head/><body><p  style=\'white-space:pre\'>Shift+Click to select the output directory.</p></body></html>"))
         self.convertButton.setText(_translate("mainWindow", "Convert"))
         self.clearButton.setText(_translate("mainWindow", "Clear list"))
+        self.authorBox.setToolTip(_translate("mainWindow", "<html><head/><body><p style=\'white-space:pre\'>Check to set comic author. Default is KCC.</p></body></html>"))
+        self.authorBox.setText(_translate("mainWindow", "Set comic author"))
+        self.authorEdit.setText(_translate("mainWindow", "KCC"))
 
 from . import KCC_rc

@@ -645,7 +645,12 @@ def getOutputFilename(srcpath, wantedname, ext, tomenumber):
 
 def getComicInfo(path, originalpath):
     xmlPath = os.path.join(path, 'ComicInfo.xml')
-    options.authors = ['KCC']
+    if options.defaultAuthor != '':
+        defaultAuthor = options.defaultAuthor
+    else:
+        defaultAuthor = 'KCC'
+    options.authors = [defaultAuthor]
+    options.remoteCovers = {}
     options.chapters = []
     options.summary = ''
     titleSuffix = ''
@@ -679,7 +684,9 @@ def getComicInfo(path, originalpath):
             options.authors = list(set(options.authors))
             options.authors.sort()
         else:
-            options.authors = ['KCC']
+            options.authors = [defaultAuthor]
+        if xml.data['MUid']:
+            options.remoteCovers = getCoversFromMCB(xml.data['MUid'])
         if xml.data['Bookmarks']:
             options.chapters = xml.data['Bookmarks']
         if xml.data['Summary']:
@@ -924,6 +931,8 @@ def makeParser():
                              help="Output generated file to specified directory or file")
     outputOptions.add_option("-t", "--title", action="store", dest="title", default="defaulttitle",
                              help="Comic title [Default=filename or directory name]")
+    outputOptions.add_option("-a", "--author", action="store", dest="author", default="KCC",
+                             help="Comic author")
     outputOptions.add_option("-f", "--format", action="store", dest="format", default="Auto",
                              help="Output format (Available options: Auto, MOBI, EPUB, CBZ, KFX) [Default=Auto]")
     outputOptions.add_option("-b", "--batchsplit", type="int", dest="batchsplit", default="0",

@@ -280,6 +280,10 @@ class WorkerThread(QtCore.QThread):
         if GUI.currentMode > 2:
             options.customwidth = str(GUI.widthBox.value())
             options.customheight = str(GUI.heightBox.value())
+        if GUI.authorBox.isChecked() and GUI.authorEdit.text() != '':
+            options.defaultAuthor = GUI.authorEdit.text()
+        else:
+            options.defaultAuthor = 'KCC'
 
         for i in range(GUI.jobList.count()):
             # Make sure that we don't consider any system message as job to do
@@ -464,17 +468,56 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 class KCCGUI(KCC_ui.Ui_mainWindow):
-    def selectDir(self):
+    # I use selectDirs() instead
+    # def selectDir(self):
+    #     if self.needClean:
+    #         self.needClean = False
+    #         GUI.jobList.clear()
+    #     dname = QtWidgets.QFileDialog.getExistingDirectory(MW, 'Select directory', self.lastPath)
+    #     if dname != '':
+    #         if sys.platform.startswith('win'):
+    #             dname = dname.replace('/', '\\')
+    #         self.lastPath = os.path.abspath(os.path.join(dname, os.pardir))
+    #         GUI.jobList.addItem(dname)
+    #         GUI.jobList.scrollToBottom()
+
+    def selectDirs(self):
         if self.needClean:
             self.needClean = False
             GUI.jobList.clear()
-        dname = QtWidgets.QFileDialog.getExistingDirectory(MW, 'Select directory', self.lastPath)
-        if dname != '':
-            if sys.platform.startswith('win'):
-                dname = dname.replace('/', '\\')
-            self.lastPath = os.path.abspath(os.path.join(dname, os.pardir))
-            GUI.jobList.addItem(dname)
-            GUI.jobList.scrollToBottom()
+
+        # Create the dialog which can select multiple directories
+        dialog = QtWidgets.QFileDialog(MW, 'Select directory', self.lastPath)
+        dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
+        dialog.setOption(QtWidgets.QFileDialog.DontUseNativeDialog, True)
+
+        # There is two piece of code to make the dialog to select multiple directories
+
+        # === Code 1 ===
+        # child_view = dialog.findChild(QtWidgets.QListView, 'listView')
+        # if child_view:
+        #     child_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # f_tree_view = dialog.findChild(QtWidgets.QTreeView)
+        # if f_tree_view:
+        #     f_tree_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # ===============
+
+        # === Code 2 ===
+        for view in dialog.findChildren((QtWidgets.QListView, QtWidgets.QTreeView)):
+            if isinstance(view.model(), QtWidgets.QFileSystemModel):
+                view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # ===============
+
+        # Get the array of directory path
+        if dialog.exec():
+            paths = dialog.selectedFiles()
+            self.lastPath = os.path.abspath(os.path.join(paths[0], os.pardir))
+            for path in paths:
+                if path != '':
+                    if sys.platform.startswith('win'):
+                        path = path.replace('/', '\\')
+                    GUI.jobList.addItem(path)
+                    GUI.jobList.scrollToBottom()
 
     def selectFile(self):
         if self.needClean:
@@ -563,6 +606,8 @@ class KCCGUI(KCC_ui.Ui_mainWindow):
         GUI.gammaWidget.setEnabled(status)
         GUI.customWidget.setEnabled(status)
         GUI.convertButton.setEnabled(True)
+        GUI.authorBox.setEnabled(status)
+        GUI.authorEdit.setEnabled(status and GUI.authorBox.isChecked())
         if enable == 1:
             self.conversionAlive = False
             self.worker.sync()
@@ -666,6 +711,12 @@ class KCCGUI(KCC_ui.Ui_mainWindow):
         else:
             GUI.outputSplit.setEnabled(False)
             GUI.outputSplit.setChecked(False)
+
+    def toggleAuthorBox(self, value):
+        if value:
+            GUI.authorEdit.setEnabled(True)
+        else:
+            GUI.authorEdit.setEnabled(False)
 
     def stripTags(self, html):
         s = HTMLStripper()
@@ -1003,7 +1054,7 @@ class KCCGUI(KCC_ui.Ui_mainWindow):
         self.detectKindleGen(True)
 
         APP.messageFromOtherInstance.connect(self.handleMessage)
-        GUI.directoryButton.clicked.connect(self.selectDir)
+        GUI.directoryButton.clicked.connect(self.selectDirs)
         GUI.clearButton.clicked.connect(self.clearJobs)
         GUI.fileButton.clicked.connect(self.selectFile)
         GUI.editorButton.clicked.connect(self.selectFileMetaEditor)
@@ -1015,6 +1066,7 @@ class KCCGUI(KCC_ui.Ui_mainWindow):
         GUI.qualityBox.stateChanged.connect(self.togglequalityBox)
         GUI.deviceBox.activated.connect(self.changeDevice)
         GUI.formatBox.activated.connect(self.changeFormat)
+        GUI.authorBox.stateChanged.connect(self.toggleAuthorBox)
         MW.progressBarTick.connect(self.updateProgressbar)
         MW.modeConvert.connect(self.modeConvert)
         MW.addMessage.connect(self.addMessage)
