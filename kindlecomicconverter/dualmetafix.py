@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Based on initial version of DualMetaFix. Copyright (C) 2013 Kevin Hendricks
-# Changes for KCC Copyright (C) 2014-2018 Pawel Jastrzebski <pawelj@iosphe.re>
+# Changes for KCC Copyright (C) 2014-2019 Pawel Jastrzebski <pawelj@iosphe.re>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import shutil
 
 class DualMetaFixException(Exception):
     pass
+
 
 # palm database offset constants
 number_of_pdb_records = 76
@@ -142,14 +143,12 @@ class DualMobiMetaFix:
         self.datain_rec0 = readsection(self.datain, 0)
 
         # in the first mobi header
-        # add 501 to "EBOK", add 113 as asin, add 504 as asin
+        # add 501 to "EBOK", add 113 as asin
         rec0 = self.datain_rec0
         rec0 = del_exth(rec0, 501)
         rec0 = del_exth(rec0, 113)
-        rec0 = del_exth(rec0, 504)
         rec0 = add_exth(rec0, 501, b'EBOK')
         rec0 = add_exth(rec0, 113, asin)
-        rec0 = add_exth(rec0, 504, asin)
         replacesection(self.datain, 0, rec0)
 
         ver = getint(self.datain_rec0, mobi_version)
@@ -171,14 +170,12 @@ class DualMobiMetaFix:
         self.datain_kfrec0 = readsection(self.datain, datain_kf8)
 
         # in the second header
-        # add 501 to "EBOK", add 113 as asin, add 504 as asin
+        # add 501 to "EBOK", add 113 as asin
         rec0 = self.datain_kfrec0
         rec0 = del_exth(rec0, 501)
         rec0 = del_exth(rec0, 113)
-        rec0 = del_exth(rec0, 504)
         rec0 = add_exth(rec0, 501, b'EBOK')
         rec0 = add_exth(rec0, 113, asin)
-        rec0 = add_exth(rec0, 504, asin)
         replacesection(self.datain, datain_kf8, rec0)
 
         self.datain.flush()

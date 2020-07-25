@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2012-2014 Ciro Mattia Gonano <ciromattia@gmail.com>
-# Copyright (c) 2013-2018 Pawel Jastrzebski <pawelj@iosphe.re>
+# Copyright (c) 2013-2019 Pawel Jastrzebski <pawelj@iosphe.re>
 #
 # Permission to use, copy, modify, and/or distribute this software for
 # any purpose with or without fee is hereby granted, provided that the
@@ -28,11 +28,11 @@ import os
 if sys.platform.startswith('darwin'):
     if getattr(sys, 'frozen', False):
         os.environ['PATH'] = os.path.dirname(os.path.abspath(sys.executable)) + \
-            '/../Resources:/usr/local/bin:/usr/bin:/bin'
-        os.system('defaults write com.kindlecomicconverter.KindleComicConverter ApplePersistenceIgnoreState YES')
-        os.system('defaults write com.kindlecomicconverter.KindleComicConverter NSInitialToolTipDelay -int 1000')
+                             '/../Resources:/Applications/Kindle Comic Creator/Kindle Comic Creator.app/Contents/' \
+                             'MacOS:/usr/local/bin:/usr/bin:/bin'
+        os.chdir(os.path.dirname(os.path.abspath(sys.executable)) + '/../Resources')
     else:
-        os.environ['PATH'] = os.path.dirname(os.path.abspath(__file__)) + '/other/osx/:' + os.environ['PATH']
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
 elif sys.platform.startswith('win'):
     if getattr(sys, 'frozen', False):
         os.chdir(os.path.dirname(os.path.abspath(sys.executable)))
@@ -40,16 +40,17 @@ elif sys.platform.startswith('win'):
         os.environ['PATH'] = os.path.dirname(os.path.abspath(__file__)) + '/other/windows/;' + os.environ['PATH']
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
 # Load additional Sentry configuration
-if getattr(sys, 'frozen', False):
-    try:
-        import kindlecomicconverter.sentry
-    except ImportError:
-        pass
+# if getattr(sys, 'frozen', False):
+#     try:
+#        import kindlecomicconverter.sentry
+#    except ImportError:
+#        pass
 
-from multiprocessing import freeze_support
+from multiprocessing import freeze_support, set_start_method
 from kindlecomicconverter.startup import start
 
 if __name__ == "__main__":
+    set_start_method('spawn')
     freeze_support()
     start()
 
